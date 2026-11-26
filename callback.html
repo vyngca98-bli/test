@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok OAuth Callback — Chronix Video Studio Uploader</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; max-width: 720px; margin: 48px auto; padding: 0 20px; line-height: 1.6; color: #1f2937; }
+    .box { border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; background: #f9fafb; margin-top: 20px; }
+    code, pre { background: #111827; color: #f9fafb; padding: 12px 14px; border-radius: 8px; display: block; overflow-x: auto; word-break: break-all; font-size: 14px; }
+    button { margin-top: 12px; padding: 10px 18px; border: 0; border-radius: 8px; background: #2563eb; color: #fff; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .ok { color: #059669; font-weight: 600; }
+    .err { color: #dc2626; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>TikTok OAuth Callback</h1>
+  <div id="content" class="box">Reading authorization response...</div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const scopes = params.get("scopes");
+    const state = params.get("state");
+    const error = params.get("error");
+    const errorDesc = params.get("error_description");
+    const el = document.getElementById("content");
+
+    if (error) {
+      el.innerHTML = `<p class="err">Authorization failed: ${error}</p><p>${errorDesc || ""}</p>`;
+    } else if (code) {
+      el.innerHTML = `
+        <p class="ok">Authorization code received! (Processed locally in your browser.)</p>
+        <p><strong>Decoded Authorization Code:</strong></p>
+        <pre id="codeBox"></pre>
+        <button id="copyBtn">Copy Code</button>
+        <p style="margin-top:16px;color:#6b7280;font-size:14px;">
+          Scopes: ${scopes || "(none)"} &middot; State: ${state || "(none)"}
+        </p>
+      `;
+      document.getElementById("codeBox").textContent = code;
+      document.getElementById("copyBtn").addEventListener("click", async () => {
+        await navigator.clipboard.writeText(code);
+        document.getElementById("copyBtn").textContent = "Copied!";
+      });
+    } else {
+      el.innerHTML = `<p>No authorization <code>code</code> found in the URL yet. Use this page as your TikTok Login Kit Redirect URI.</p>`;
+    }
+  </script>
+</body>
+</html>
